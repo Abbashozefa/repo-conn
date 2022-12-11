@@ -9,6 +9,8 @@ from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.template import Context
+from .models import Employee
+from .forms import EmployeeForm
 
 
 #################### index#######################################
@@ -55,3 +57,41 @@ def Login(request):
 			messages.info(request, f'account done not exit plz sign in')
 	form = AuthenticationForm()
 	return render(request, 'user/login.html', {'form':form, 'title':'log in'})
+
+
+
+def emp(request):  
+    if request.method == "POST":  
+        form = EmployeeForm(request.POST)  
+        if form.is_valid():  
+            try:  
+                form.save()  
+                return redirect('/show')  
+            except:  
+                pass  
+    else:  
+        form = EmployeeForm()  
+    return render(request,'index.html',{'form':form})  
+def show(request):
+    
+    
+      
+    employees = Employee.objects.all() 
+        
+      
+            
+    return render(request,"show.html",{'employees':employees})     
+def edit(request, id):  
+    employee = Employee.objects.get(id=id)  
+    return render(request,'edit.html', {'employee':employee})  
+def update(request, id):  
+    employee = Employee.objects.get(id=id)  
+    form = EmployeeForm(request.POST, instance = employee)  
+    if form.is_valid():  
+        form.save()  
+        return redirect("/show")  
+    return render(request, 'edit.html', {'employee': employee})  
+def destroy(request, id):  
+    employee = Employee.objects.get(id=id)  
+    employee.delete()  
+    return redirect("/show")
